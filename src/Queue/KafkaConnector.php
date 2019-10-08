@@ -32,7 +32,7 @@ class KafkaConnector
         $topicConf->set('auto.offset.reset', 'largest');
         $conf = $this->container['conf'];
         $conf->set('log_level', $config->get('log_level'));
-        $conf->set('group.id', $config->get('group.id'));
+        $conf->set('group.id', $config->get('group_id'));
         $conf->set('metadata.broker.list', $config->get('brokers'));
         $conf->set('enable.auto.commit', 'false');
         if($config->get('debug')){
