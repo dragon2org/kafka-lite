@@ -13,13 +13,22 @@ class ConnectorTest extends TestCase
     {
         $app = new Application($this->getConfig());
         $queue = $app['kafka.queue'];
-        $queue->push(['payload' => 'Hello World', 'intro' => '我就是火']);
+        $rpos = [
+            'aaa' => 11
+        ];
+        $payload = [
+            'body' => [
+                'params' => $rpos,
+                'module' => 'DhbApi',
+                'controller' => 'AlipayApi',
+                'action' => 'alipayPayNotify',
+                'noSkey' => 'noSkey',
+            ],
+        ];
+        $queue->push($payload);
     }
 
-    /**
-     * 这个测试必须在push生产被释放后才有用
-     * @depends testPush
-     */
+
     public function testPop()
     {
         $app = new Application($this->getConfig());
@@ -40,8 +49,10 @@ class ConnectorTest extends TestCase
         while(true){
             $message = $queue->pop();
             if(!is_null($message)){
+                print_r(json_decode($message->payload, true));
                 $result = $queue->delete($message);
             }
+            sleep(1);
         }
     }
 

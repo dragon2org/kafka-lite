@@ -31,12 +31,13 @@ class KafkaConnector
         $topicConf = $this->container['topic_conf'];
         $topicConf->set('auto.offset.reset', 'largest');
         $conf = $this->container['conf'];
-        $conf->set('debug', $config->get('debug'));
         $conf->set('log_level', $config->get('log_level'));
         $conf->set('group.id', $config->get('group.id'));
         $conf->set('metadata.broker.list', $config->get('brokers'));
         $conf->set('enable.auto.commit', 'false');
-       // $conf->set('offset.store.method', $config->get('offset.store.method'));
+        if($config->get('debug')){
+            $conf->set('debug', $config->get('debug'));
+        }
         $conf->setDefaultTopicConf($topicConf);
 
         $consumer = $this->container->raw('consumer');

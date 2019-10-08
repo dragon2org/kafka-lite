@@ -80,7 +80,6 @@ class SEKafkaQueue
             $pushRawCorrelationId = $this->getCorrelationId();
 
             $topic->produce(RD_KAFKA_PARTITION_UA, 0, $payload, $pushRawCorrelationId);
-            echo 'pushRawCorrelationId' . $pushRawCorrelationId . PHP_EOL;
             return $pushRawCorrelationId;
         } catch (ErrorException $exception) {
             $this->reportConnectionError('pushRaw', $exception);
