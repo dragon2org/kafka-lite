@@ -140,11 +140,7 @@ class SEKafkaQueue
 
     public function delete(\RdKafka\Message $message)
     {
-        try {
-            $this->consumer->commitAsync($message);
-        } catch (\RdKafka\Exception $exception) {
-            throw new QueueKafkaException('Could not delete job from the queue', 0, $exception);
-        }
+        //low level consume 不需要手动提交
     }
 
     public function release(\RdKafka\Message $message)
