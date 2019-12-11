@@ -26,6 +26,7 @@ class TestCase extends BaseTestCase
             'group_id' => 'CID_alikafka_mini_program_publish_common_test',
             'brokers' => 'docker.for.mac.localhost:9092',
             'queue' => 'alikafka_mini_program_publish_test1_4',
+            'partition' => 0,
         ];
 
         return $config;
