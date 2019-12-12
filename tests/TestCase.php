@@ -27,6 +27,8 @@ class TestCase extends BaseTestCase
             'brokers' => 'docker.for.mac.localhost:9092',
             'queue' => 'alikafka_mini_program_publish_test1_4',
             'partition' => 0,
+            'timeout_ms' => 1,
+            'enable.idempotence' => false, //
         ];
 
         return $config;

@@ -34,7 +34,9 @@ class KafkaConnector
         $conf->set('log_level', $config->get('log_level'));
         $conf->set('group.id', $config->get('group_id'));
         $conf->set('metadata.broker.list', $config->get('brokers'));
-        $conf->set('enable.idempotence', 'true');
+        if($config->get('enable.idempotence')){
+            $conf->set('enable.idempotence', 'true');
+        }
         if($config->get('debug')){
             $conf->set('debug', $config->get('debug'));
         }
