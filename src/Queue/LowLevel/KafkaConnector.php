@@ -25,7 +25,6 @@ class KafkaConnector
     {
         $config = $this->container['config'];
         $producer = $this->container['producer'];
-        $brokers = $config->get('brokers');
         $producer->addBrokers($config->get('brokers'));
 
         $topicConf = $this->container['topic_conf'];

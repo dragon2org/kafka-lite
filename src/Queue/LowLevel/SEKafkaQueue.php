@@ -79,7 +79,7 @@ class SEKafkaQueue
 
             $pushRawCorrelationId = $this->getCorrelationId();
 
-            $topic->produce(RD_KAFKA_PARTITION_UA, 0, $payload, $pushRawCorrelationId);
+            $topic->produce($this->config->get('partition'), 0, $payload, $pushRawCorrelationId);
             return $pushRawCorrelationId;
         } catch (ErrorException $exception) {
             $this->reportConnectionError('pushRaw', $exception);
