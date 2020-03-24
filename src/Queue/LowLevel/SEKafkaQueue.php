@@ -55,6 +55,28 @@ class SEKafkaQueue
 
     public function push(array $data)
     {
+        return $this->pushRaw($this->getPayload($data));
+    }
+
+    public function pushOne(array $data)
+    {
+        try {
+            $topic = $this->getTopic($this->getQueueName());
+
+            $pushRawCorrelationId = $this->getCorrelationId();
+
+            $topic->produce($this->config->get('partition'), 0, $this->getPayload($data), $pushRawCorrelationId);
+
+            $this->poll(1);
+
+            return $pushRawCorrelationId;
+        } catch (ErrorException $exception) {
+            $this->reportConnectionError('pushRaw', $exception);
+        }
+    }
+
+    protected function getPayload($data)
+    {
         $payload = [
             'data' => $data,
             'id' => $this->setCorrelationId(),
@@ -69,7 +91,7 @@ class SEKafkaQueue
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );
         }
-        return $this->pushRaw($payload);
+        return $payload;
     }
 
     public function pushRaw($payload)
@@ -158,4 +180,11 @@ class SEKafkaQueue
        return $this->pushRaw($payload);
     }
 
+    public function poll($limit = 1)
+    {
+        $limit = $limit <= 1 ? 1 : $limit;
+        while ($this->producer->getOutQLen() >= $limit) {
+            $this->producer->poll(1);
+        }
+    }
 }

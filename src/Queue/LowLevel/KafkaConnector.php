@@ -40,6 +40,12 @@ class KafkaConnector
         if($config->get('debug')){
             $conf->set('debug', $config->get('debug'));
         }
+        if (function_exists('pcntl_sigprocmask')) {
+            pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+            $conf->set('internal.termination.signal', SIGIO);
+        } else {
+            $conf->set('queue.buffering.max.ms', $config->get('queue.buffering.max.ms', 1));
+        }
 
         if($config->get('dr_msg_')){
             $conf->setDrMsgCb(function ($kafka, $message) use($config){

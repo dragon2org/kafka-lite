@@ -38,6 +38,13 @@ class KafkaConnector
         if($config->get('debug')){
             $conf->set('debug', $config->get('debug'));
         }
+        $conf->set('socket.timeout.ms', 50); // or socket.blocking.max.ms, depending on librdkafka version
+        if (function_exists('pcntl_sigprocmask')) {
+            pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+            $conf->set('internal.termination.signal', SIGIO);
+        } else {
+            $conf->set('queue.buffering.max.ms', $config->get('queue.buffering.max.ms', 1));
+        }
         $conf->setDefaultTopicConf($topicConf);
 
         $consumer = $this->container->raw('consumer');

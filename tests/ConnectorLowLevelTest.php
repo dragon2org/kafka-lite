@@ -77,4 +77,43 @@ class ConnectorLowLevelTest extends TestCase
             }
         }
     }
+
+    public function testFastPush()
+    {
+        $app = new Application($this->getConfig());
+        $queue = $app['kafka.queue'];
+        $rpos = [
+            'aaa' => 11
+        ];
+        $payload = [
+            'body' => [
+                'params' => $rpos,
+                'module' => 'DhbApi',
+                'controller' => 'AlipayApi',
+                'action' => 'alipayPayNotify',
+                'noSkey' => 'noSkey',
+            ],
+        ];
+        $queue->pushOne($payload);
+    }
+
+    public function testPushPoll()
+    {
+        $app = new Application($this->getConfig());
+        $queue = $app['kafka.queue'];
+        $rpos = [
+            'aaa' => 11
+        ];
+        $payload = [
+            'body' => [
+                'params' => $rpos,
+                'module' => 'DhbApi',
+                'controller' => 'AlipayApi',
+                'action' => 'alipayPayNotify',
+                'noSkey' => 'noSkey',
+            ],
+        ];
+        $queue->push($payload);
+        $queue->poll();
+    }
 }
