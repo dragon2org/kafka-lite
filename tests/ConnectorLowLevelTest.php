@@ -116,4 +116,58 @@ class ConnectorLowLevelTest extends TestCase
         $queue->push($payload);
         $queue->poll();
     }
+
+    public function testLowUsefulCommit()
+    {
+        $config = $this->getConfig();
+        $config['common']['enable.auto.offset.store'] = 'false';
+        $config['common']['enable.auto.commit'] = 'false';
+        $app = new Application($config);
+
+        $queue = $app['kafka.queue'];
+
+        echo 'enable.auto.commit status: '. $app['conf']->dump()['enable.auto.commit'] . PHP_EOL;
+
+        while (true){
+            $message = $queue->pop();
+            if (!is_null($message)) {
+                print_r($message);
+                $queue->delete($message);
+                break;
+            }
+        }
+    }
+
+    public function testRawLowCommit()
+    {
+        $conf = new \RdKafka\Conf();
+        $config = $this->getConfig();
+        $config['common']['enable.auto.offset.store'] = 'false';
+        $config['common']['enable.auto.commit'] = 'false';
+        if (function_exists('pcntl_sigprocmask')) {
+            pcntl_sigprocmask(SIG_BLOCK, array(SIGIO));
+            $conf->set('internal.termination.signal', SIGIO);
+        } else {
+            $conf->set('queue.buffering.max.ms', 1);
+        }
+        $topicConf = new \RdKafka\TopicConf();
+
+        $conf->set('group.id', $config['group_id']);
+        $conf->set('metadata.broker.list',$config['brokers']);
+
+        $conf->setDefaultTopicConf($topicConf);
+
+        $consumer = new \RdKafka\Consumer($conf);
+        $consumer->addBrokers($config['brokers']);
+
+        $topic = $consumer->newTopic($config['queue'], $topicConf);
+        $topic->consumeStart(0, RD_KAFKA_OFFSET_STORED);
+
+        while(true){
+            $msg = $topic->consume(0, 1000);
+            if(!is_null($msg)){
+                print_r($msg);die;
+            }
+        }
+    }
 }

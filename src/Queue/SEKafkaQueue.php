@@ -189,7 +189,9 @@ class SEKafkaQueue
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );
        }
-       return $this->pushRaw($payload);
+
+        $this->pushRaw($payload);
+        $this->poll();
     }
 
     public function poll($limit = 1)

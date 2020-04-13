@@ -162,7 +162,15 @@ class SEKafkaQueue
 
     public function delete(\RdKafka\Message $message)
     {
-        //low level consume 不需要手动提交
+        if($this->config->get('enable.auto.offset.store') == 'false'){
+            $this->consumer->offsetStore($this->config->get('partition'), $message->offset);
+        }
+
+        try {
+            $this->consumer->commit($message);
+        } catch (\RdKafka\Exception $exception) {
+            throw new QueueKafkaException('Could not delete job from the queue', 0, $exception);
+        }
     }
 
     public function release(\RdKafka\Message $message)
@@ -177,7 +185,9 @@ class SEKafkaQueue
                 'Unable to JSON encode payload. Error code: '.json_last_error()
             );
        }
-       return $this->pushRaw($payload);
+
+       $this->pushRaw($payload);
+       $this->poll();
     }
 
     public function poll($limit = 1)
