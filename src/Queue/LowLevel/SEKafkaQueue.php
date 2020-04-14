@@ -167,7 +167,7 @@ class SEKafkaQueue
         }
 
         try {
-            $this->consumer->commit($message);
+            $this->consumer->commitAsync($message);
         } catch (\RdKafka\Exception $exception) {
             throw new QueueKafkaException('Could not delete job from the queue', 0, $exception);
         }
@@ -175,7 +175,6 @@ class SEKafkaQueue
 
     public function release(\RdKafka\Message $message)
     {
-       $this->delete($message);
        $payload = json_decode($message->payload, true);
        $payload['attempts']+=1;
        $payload['updated_at'] = date('Y-m-d H:i:s');
@@ -188,6 +187,8 @@ class SEKafkaQueue
 
        $this->pushRaw($payload);
        $this->poll();
+
+        $this->delete($message);
     }
 
     public function poll($limit = 1)
