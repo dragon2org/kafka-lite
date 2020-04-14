@@ -165,12 +165,6 @@ class SEKafkaQueue
         if($this->config->get('enable.auto.offset.store') == 'false'){
             $this->consumer->offsetStore($this->config->get('partition'), $message->offset);
         }
-
-        try {
-            $this->consumer->commitAsync($message);
-        } catch (\RdKafka\Exception $exception) {
-            throw new QueueKafkaException('Could not delete job from the queue', 0, $exception);
-        }
     }
 
     public function release(\RdKafka\Message $message)
