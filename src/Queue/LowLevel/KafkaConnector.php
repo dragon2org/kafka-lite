@@ -28,7 +28,7 @@ class KafkaConnector
         $producer->addBrokers($config->get('brokers'));
 
         $topicConf = $this->container['topic_conf'];
-        $topicConf->set('request.required.acks', 0);
+        $topicConf->set('request.required.acks', 1);
 
         $conf = $this->container['conf'];
         $conf->set('log_level', $config->get('log_level'));
